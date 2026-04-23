@@ -1,22 +1,19 @@
 # Use a lightweight Python base image
 FROM python:3.9-slim
 
-# Set the working directory in the container
+# Set the working directory
 WORKDIR /app
 
-# Install system libraries required by OpenCV/Pillow
-RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx \
-    libglib2.0-0 \
-    && rm -rf /var/lib/apt/lists/*
+# We are skipping apt-get update to avoid the connection timeout.
+# Pillow and NumPy usually work fine on slim without extra system libs.
 
-# Copy the requirements and install them
-COPY ../requirements.txt .
+# Copy requirements and install
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the ONNX model from the root and the API script
-COPY ../model.onnx .
-COPY app.py ./service/
+# Copy the model and the service folder
+COPY model.onnx .
+COPY service/ ./service/
 
 # Expose the API port
 EXPOSE 8000
