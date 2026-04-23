@@ -8,7 +8,7 @@ import os
 
 print("🚀 Starting Rapid Train & ONNX Export...")
 
-# 1. Setup & Data Loading
+# Setup & Data Loading
 DATA_DIR = "dataset_output/mini_plant_set"
 BATCH_SIZE = 32
 NUM_CLASSES = 5
@@ -25,14 +25,14 @@ test_set = datasets.ImageFolder(os.path.join(DATA_DIR, 'test'), transform=transf
 train_loader = DataLoader(train_set, batch_size=BATCH_SIZE, shuffle=True)
 test_loader = DataLoader(test_set, batch_size=BATCH_SIZE)
 
-# 2. Model Initialization (MobileNetV3-Small FP32)
+# Model Initialization (MobileNetV3-Small FP32)
 model = models.mobilenet_v3_small(weights='DEFAULT')
 model.classifier[3] = nn.Linear(model.classifier[3].in_features, NUM_CLASSES)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = model.to(device)
 
-# 3. Training Loop (3 Epochs for speed)
+# Training Loop (3 Epochs for speed)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
@@ -50,7 +50,7 @@ for epoch in range(3):
     train_one_epoch()
     print(f"✅ Epoch {epoch+1} complete.")
 
-# 4. Evaluation (Macro-F1)
+# Evaluation (Macro-F1)
 model.eval()
 y_true, y_pred = [], []
 with torch.no_grad():
@@ -64,7 +64,7 @@ with torch.no_grad():
 macro_f1 = f1_score(y_true, y_pred, average='macro')
 print(f"🎯 Clean Test Macro-F1: {macro_f1:.4f}")
 
-# 5. IMMEDIATE DIRECT EXPORT TO ONNX (Replacing the .pth save)
+# IMMEDIATE DIRECT EXPORT TO ONNX (Replacing the .pth save)
 print("\nExporting directly to ONNX...")
 model.to('cpu')
 dummy_input = torch.randn(1, 3, 224, 224)

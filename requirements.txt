@@ -15,3 +15,6 @@ onnxruntime
 fastapi
 uvicorn
 python-multipart
+onnxruntime
+Pillow
+numpy
