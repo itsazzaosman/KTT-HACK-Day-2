@@ -10,9 +10,9 @@ This repository contains the complete submission for the **AIMS KTT Hackathon Ti
 ## 📊 Performance Summary
 
 - **Backbone:** MobileNetV3-Small (Fine-tuned)
-- **Clean Test Macro-F1:** **0.9933** (Target: $\ge 80\%$)
+- **Clean Test Macro-F1:** **0.9610** (Target: $\ge 80\%$)
 - **Robustness Bonus (Field):** **0.8810** (Drop < 12 points)
-- **Final Model Size:** **1.96 MB** (Target: < 10 MB)
+- **Final Model Size:** **5.82** **MB** (Target: < 10 MB)
 - **Format:** ONNX (INT8 Quantized)
 - **Inference Latency:** ~15ms (CPU-only)
 

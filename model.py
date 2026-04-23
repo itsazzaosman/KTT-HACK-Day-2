@@ -6,6 +6,8 @@ from torch.utils.data import DataLoader
 from sklearn.metrics import f1_score
 import os
 
+print("🚀 Starting Rapid Train & ONNX Export...")
+
 # 1. Setup & Data Loading
 DATA_DIR = "dataset_output/mini_plant_set"
 BATCH_SIZE = 32
@@ -18,22 +20,19 @@ transform = transforms.Compose([
 ])
 
 train_set = datasets.ImageFolder(os.path.join(DATA_DIR, 'train'), transform=transform)
-val_set = datasets.ImageFolder(os.path.join(DATA_DIR, 'val'), transform=transform)
 test_set = datasets.ImageFolder(os.path.join(DATA_DIR, 'test'), transform=transform)
 
 train_loader = DataLoader(train_set, batch_size=BATCH_SIZE, shuffle=True)
-val_loader = DataLoader(val_set, batch_size=BATCH_SIZE)
 test_loader = DataLoader(test_set, batch_size=BATCH_SIZE)
 
-# 2. Model Initialization (MobileNetV3-Small)
-# Chosen for its small footprint and quantization-friendly architecture
+# 2. Model Initialization (MobileNetV3-Small FP32)
 model = models.mobilenet_v3_small(weights='DEFAULT')
 model.classifier[3] = nn.Linear(model.classifier[3].in_features, NUM_CLASSES)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = model.to(device)
 
-# 3. Training Loop
+# 3. Training Loop (3 Epochs for speed)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
@@ -47,10 +46,9 @@ def train_one_epoch():
         loss.backward()
         optimizer.step()
 
-# Execute 5-10 epochs for quick hackathon results
-for epoch in range(5):
+for epoch in range(3):
     train_one_epoch()
-    print(f"Epoch {epoch+1} complete.")
+    print(f"✅ Epoch {epoch+1} complete.")
 
 # 4. Evaluation (Macro-F1)
 model.eval()
@@ -64,20 +62,32 @@ with torch.no_grad():
         y_pred.extend(preds.cpu().numpy())
 
 macro_f1 = f1_score(y_true, y_pred, average='macro')
-print(f"Clean Test Macro-F1: {macro_f1:.4f}")
+print(f"🎯 Clean Test Macro-F1: {macro_f1:.4f}")
 
-# 5. Quantization to INT8
-# This step is critical for the < 10MB requirement
+# 5. IMMEDIATE DIRECT EXPORT TO ONNX (Replacing the .pth save)
+print("\nExporting directly to ONNX...")
 model.to('cpu')
-model.qconfig = torch.quantization.get_default_qconfig('fbgemm')
-torch.quantization.prepare(model, inplace=True)
-# Calibrate with a few batches
-with torch.no_grad():
-    for i, (imgs, _) in enumerate(train_loader):
-        if i > 5: break
-        model(imgs)
-torch.quantization.convert(model, inplace=True)
+dummy_input = torch.randn(1, 3, 224, 224)
+output_path = "model.onnx"
 
-# Save the quantized model
-torch.save(model.state_dict(), "model_quantized.pth")
-print(f"Model size: {os.path.getsize('model_quantized.pth') / 1e6:.2f} MB")
+try:
+    torch.onnx.export(
+        model, 
+        dummy_input, 
+        output_path, 
+        export_params=True, 
+        opset_version=13,
+        input_names=['input'], 
+        output_names=['output'],
+        dynamic_axes={'input': {0: 'batch_size'}, 'output': {0: 'batch_size'}}
+    )
+    
+    file_size = os.path.getsize(output_path) / (1024 * 1024)
+    print(f"🎉 SUCCESS! '{output_path}' created.")
+    print(f"📦 Final Size: {file_size:.2f} MB")
+    
+    if file_size < 10:
+        print("✅ Task 2 Pass: Model is under the 10 MB limit.")
+
+except Exception as e:
+    print(f"❌ Export failed: {e}")
