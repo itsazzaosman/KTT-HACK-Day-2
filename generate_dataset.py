@@ -6,14 +6,13 @@ from io import BytesIO
 from PIL import Image, ImageFilter, ImageEnhance
 from datasets import load_dataset
 
-# Configuration
 CLASSES = ["healthy", "maize_rust", "maize_blight", "cassava_mosaic", "bean_spot"]
 SAMPLES_PER_CLASS = 300
 IMAGE_SIZE = (224, 224)
 SPLIT_RATIOS = {"train": 0.8, "val": 0.1, "test": 0.1}
 FIELD_SAMPLES_TOTAL = 60
 
-# Paths
+
 OUTPUT_DIR = "dataset_output"
 MINI_PLANT_DIR = os.path.join(OUTPUT_DIR, "mini_plant_set")
 TEST_FIELD_DIR = os.path.join(OUTPUT_DIR, "test_field")
@@ -28,16 +27,16 @@ def setup_directories():
 
 def apply_field_augmentations(img):
     """Applies random blur, brightness jitter, and JPEG compression."""
-    # 1. Random Blur (sigma 0 to 1.5)
+    #Random Blur (sigma 0 to 1.5)
     sigma = random.uniform(0, 1.5)
     if sigma > 0:
         img = img.filter(ImageFilter.GaussianBlur(radius=sigma))
     
-    # 2. Brightness Jitter
+    # Brightness Jitter
     enhancer = ImageEnhance.Brightness(img)
     img = enhancer.enhance(random.uniform(0.7, 1.3))
     
-    # 3. JPEG Compression (quality 50 to 85)
+    # JPEG Compression (quality 50 to 85)
     q = random.randint(50, 85)
     buffer = BytesIO()
     img.save(buffer, format="JPEG", quality=q)
@@ -46,15 +45,15 @@ def apply_field_augmentations(img):
 def process_and_save():
     setup_directories()
     
-    # NOTE: In a live environment, you would map these to specific HF datasets 
+    # In a live environment, you would map these to specific HF datasets 
     # e.g., load_dataset("beans"), load_dataset("huggan/plant_village"), etc.
-    # For this recipe, we simulate the extraction of the 300 images per class.
+    # we simulate the extraction of the 300 images per class.
     
     class_weights = {}
     field_per_class = FIELD_SAMPLES_TOTAL // len(CLASSES)
     
     for cls in CLASSES:
-        print(f"Processing {cls}...")
+        print(f"Processing {cls} ***")
         
         # Simulated image fetch - replace with actual dataset slicing
         # images = fetch_from_hf_mirrors(cls, num_samples=SAMPLES_PER_CLASS + field_per_class)
