@@ -1,0 +1,17 @@
+# 1. Dataset Generation & Image Processing
+Pillow
+datasets
+
+# 2. Model Training & Evaluation
+torch
+torchvision
+scikit-learn
+
+# 3. Model Export & Quantization (under 10 MB budget)
+onnx
+onnxruntime
+
+# 4. HTTP Service / API Deployment
+fastapi
+uvicorn
+python-multipart
