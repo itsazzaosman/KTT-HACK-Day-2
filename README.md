@@ -1,4 +1,4 @@
-# 🌿 Edge-AI Crop Disease Classifier (KTT-T2.1)
+# 🌿 Edge-AI Crop Disease Classifier (KTT-G1)
 
 [![Hugging Face Model](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Model-blue)](https://huggingface.co/itsazza/KTT-DAY2-Model-mobilenet_v3_small)
 [![Hugging Face Dataset](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Dataset-yellow)](https://huggingface.co/datasets/itsazza/KTT-DAY-2)
