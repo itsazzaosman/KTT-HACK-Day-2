@@ -1,4 +1,4 @@
-# Process Log: AIMS KTT Hackathon Group 1
+# Process Log: AIMS KTT Hackathon Group 1 - DAY 2
 
 **Name:** Azza Osman
 
